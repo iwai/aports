@@ -2,17 +2,14 @@
 pkgname=tcp_wrappers
 pkgver=7.6
 pkgrel=0
-pkgdesc="The tcp_wrappers package provides small daemon programs which can
-         monitor and filter incoming requests for systat, finger, FTP, telnet,
-         rlogin, rsh, exec, tftp, talk and other network services.
-         "
+pkgdesc="The tcp_wrappers package provides small daemon programs."
 url="ftp://ftp.porcupine.org/pub/security/index.html"
 arch="all"
 license="BSD"
 depends=""
 makedepends="libnsl-dev"
 install=""
-subpackages="$pkgname-dev $pkgname-doc"
+subpackages=""
 source="ftp://ftp.porcupine.org/pub/security/${pkgname}_${pkgver}.tar.gz
         tcpw7.2-config.patch
         tcpw7.2-setenv.patch
@@ -59,13 +56,15 @@ build() {
 package() {
 	cd "$builddir"
 
-	cp -a libwrap.so* "$pkgdir/"/usr/lib
-	install -p -m644 tcpd.h "$pkgdir/"/usr/include
+	install -d "$pkgdir"/usr/lib/
+	install -p -m755 libwrap.so* "$pkgdir"/usr/lib/
+	install -d "$pkgdir"/usr/include/
+	install -p -m644 tcpd.h "$pkgdir"/usr/include/
 
-	install -m755 tcpd "$pkgdir"/usr/sbin
-	install -m755 tcpdchk "$pkgdir"/usr/sbin
-	install -m755 try-from "$pkgdir"/usr/sbin
-	install -m755 safe_finger "$pkgdir"/usr/sbin
+	install -D -m755 tcpd "$pkgdir"/usr/sbin/tcpd
+	install -m755 tcpdchk "$pkgdir"/usr/sbin/
+	install -m755 try-from "$pkgdir"/usr/sbin/
+	install -m755 safe_finger "$pkgdir"/usr/sbin/
 
 }
 
