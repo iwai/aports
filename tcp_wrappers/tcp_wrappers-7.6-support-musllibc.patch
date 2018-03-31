@@ -1,0 +1,59 @@
+diff -up tcp_wrappers_7.6/percent_m.c.patch tcp_wrappers_7.6/percent_m.c
+--- tcp_wrappers_7.6/percent_m.c.patch
++++ tcp_wrappers_7.6/percent_m.c
+@@ -4,6 +4,8 @@
+   * Author: Wietse Venema, Eindhoven University of Technology, The Netherlands.
+   */
+ 
++#define HAVE_STRERROR	1
++
+ #ifndef lint
+ static char sccsid[] = "@(#) percent_m.c 1.1 94/12/28 17:42:37";
+ #endif
+@@ -13,10 +15,8 @@
+ #include <string.h>
+ 
+ extern int errno;
+-#if !defined(SYS_ERRLIST_DEFINED) && !defined(HAVE_STRERROR)
+ extern char *sys_errlist[];
+ extern int sys_nerr;
+-#endif
+ 
+ #include "mystdarg.h"
+
+diff -up tcp_wrappers_7.6/tcpd.h.patch tcp_wrappers_7.6/tcpd.h
+--- tcp_wrappers_7.6/tcpd.h.patch
++++ tcp_wrappers_7.6/tcpd.h
+@@ -21,6 +21,16 @@
+ #include <netinet/in.h>
+ #include <stdio.h>
+ 
++#undef __BEGIN_DECLS
++#undef __END_DECLS
++#ifdef __cplusplus
++# define __BEGIN_DECLS extern "C" {
++# define __END_DECLS }
++#else
++# define __BEGIN_DECLS /* empty */
++# define __END_DECLS /* empty */
++#endif
++
+ __BEGIN_DECLS
+ 
+ /* Structure to describe one communications endpoint. */
+diff --git tcp_wrappers_7.6/Makefile tcp_wrappers_7.6//Makefile
+index be5a22d..9f284f4 100644
+--- tcp_wrappers_7.6//Makefile
++++ tcp_wrappers_7.6//Makefile
+@@ -379,6 +379,11 @@ machten:
+        LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ=environ.o \
+        NETGROUP= TLI= all
+ 
++alpine:
++	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
++	LIBS="-lnsl" RANLIB=ranlib ARFLAGS=rv AUX_OBJ=weak_symbols.o \
++	NETGROUP="" TLI= EXTRA_CFLAGS="-fPIC -DPIC -D_REENTRANT -DSYS_ERRLIST_DEFINED -DBROKEN_SO_LINGER -DINET6=1 -Dss_family=__ss_family -Dss_len=__ss_len -DHAVE_WEAKSYMS" all
++
+ ###############################################################
+ # System dependencies: TLI (transport-level interface) support.
+ # 

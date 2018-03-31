@@ -1,0 +1,95 @@
+# Maintainer: Yuji Iwai <iwai.ug@gmail.com>
+pkgname=tcp_wrappers
+pkgver=7.6
+pkgrel=0
+pkgdesc="The tcp_wrappers package provides small daemon programs which can
+         monitor and filter incoming requests for systat, finger, FTP, telnet,
+         rlogin, rsh, exec, tftp, talk and other network services.
+         "
+url="ftp://ftp.porcupine.org/pub/security/index.html"
+arch="all"
+license="BSD"
+depends=""
+makedepends="libnsl-dev"
+install=""
+subpackages="$pkgname-dev $pkgname-doc"
+source="ftp://ftp.porcupine.org/pub/security/${pkgname}_${pkgver}.tar.gz
+        tcpw7.2-config.patch
+        tcpw7.2-setenv.patch
+        tcpw7.6-netgroup.patch
+        tcp_wrappers-7.6-bug11881.patch
+        tcp_wrappers-7.6-bug17795.patch
+        tcp_wrappers-7.6-bug17847.patch
+        tcp_wrappers-7.6-fixgethostbyname.patch
+        tcp_wrappers-7.6-docu.patch
+        tcp_wrappers.usagi-ipv6.patch
+        tcp_wrappers.ume-ipv6.patch
+        tcp_wrappers-7.6-shared.patch
+        tcp_wrappers-7.6-sig.patch
+        tcp_wrappers-7.6-strerror.patch
+        tcp_wrappers-7.6-ldflags.patch
+        tcp_wrappers-7.6-fix_sig-bug141110.patch
+        tcp_wrappers-7.6-162412.patch
+        tcp_wrappers-7.6-220015.patch
+        tcp_wrappers-7.6-restore_sigalarm.patch
+        tcp_wrappers-7.6-siglongjmp.patch
+        tcp_wrappers-7.6-sigchld.patch
+        tcp_wrappers-7.6-196326.patch
+        tcp_wrappers_7.6-249430.patch
+        tcp_wrappers-7.6-support-musllibc.patch
+        "
+
+builddir="$srcdir/${pkgname}_${pkgver}"
+
+prepare() {
+	cd "$builddir"
+	chmod +w ./*
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+
+build() {
+	cd "$builddir"
+	make alpine
+}
+
+package() {
+	cd "$builddir"
+
+	cp -a libwrap.so* "$pkgdir/"/usr/lib
+	install -p -m644 tcpd.h "$pkgdir/"/usr/include
+
+	install -m755 tcpd "$pkgdir"/usr/sbin
+	install -m755 tcpdchk "$pkgdir"/usr/sbin
+	install -m755 try-from "$pkgdir"/usr/sbin
+	install -m755 safe_finger "$pkgdir"/usr/sbin
+
+}
+
+sha512sums="2d9d003791f8d00912a36ae00579e2b8dd7ad8a7bf8eae259659bcaf5365b150540ff6c93c91765872c76041579b7a02b6e3c64528fb7f8235680399ba1d9dac  tcp_wrappers_7.6.tar.gz
+c4f0de79cb01f28096faf7ebf0764379b0d157f9774aaffb9d8f379652831db35753e392b2674b99aadc71cc30df87181d9dd0579158e6afcfb32844da8347b8  tcpw7.2-config.patch
+cc1f3bc1ba806955b042d6b2e75d7f67fe555964feb70a43a8b460be16ba675bc45e0fa4c2cb1b337f677f3add51360f2e0f1ca68c46f9fed54af713da8097dc  tcpw7.2-setenv.patch
+bfd41674ff3082edf0166fd792597b7d7659b5a5f84d6a8e25a58a16cc4b711b4f8a0ef678fc84358237e5d0222e31d5f55c6057dd725c32ed7ee323c23cc0cd  tcpw7.6-netgroup.patch
+8e354549d7cee514eabb20776450498e81d4e12ee460cabc58a5e4ca835400674391a5df1c116d3dcf1bd961a62cbe99f2722e7aaa7d9c03e2fed69712e3645c  tcp_wrappers-7.6-bug11881.patch
+119cb6dbc0c5c548a8fb6a1a62fd0e5e39ffa67a0340aaa4aaddf9b33f5ea5b7f37379a69d5dbdd00cfbb8ba796b67d9240cc79197cdafdc0fe95146526d3400  tcp_wrappers-7.6-bug17795.patch
+e9af6badc2f377540af444208fb6afd2a7b73f6ade4f40a3e922765180d62983f2c7371a1d112204ee3d0bb7025ba0b9191fc123ffe02ea64a314fc63fc2ff2d  tcp_wrappers-7.6-bug17847.patch
+2084acc1d7f314793e75ce1f349b6749473dd87617b2c0f83632da06f74417e127c137139a5d11956c883eb2baa6d1f9aaa10fafe8d23ddaea16226464ed66fb  tcp_wrappers-7.6-fixgethostbyname.patch
+82ec0124c4a780f0bf15029a4865f0569e749563796396f96eab9315850c7fdcdee8c3caac49697abc407af358ef669b937054070cd75c53d0e9e96d96149958  tcp_wrappers-7.6-docu.patch
+86d93655558a876e69caa1a3dcdc5d07b69aa4cdc41d9eb8efea5a34e8dc0dd195c2b82a4d8be680db55225f30040e93eaf52a0daed4d3c6be9fb3ebc044aa00  tcp_wrappers.usagi-ipv6.patch
+c4e79d7831d1f15d6ebad304d5e026284a70830f781028b56fefdb1a84660c51d2a828f5e0200e5619d008d8eea82d6ec63fa0de892014fbf6664eada64428ab  tcp_wrappers.ume-ipv6.patch
+a891031acbecc1402562d54d0b546a9ea6587225b110b826ac17bd1a97d101e33cee98f753561d5b46055d9360b2a3ac2de2f71960974b937d3db8087ae5d454  tcp_wrappers-7.6-shared.patch
+65f7c7a18eb36ccae93a14e41966f9a4223568c31594b410dc97524047a1b367a9ecd65fd4f68d7cba022569459ed7da3fef692ecad28e3009eca9b708d86dd4  tcp_wrappers-7.6-sig.patch
+30b31281a7b867e7db02cc824f0412a768c264ae473375161abfbc65c2b88b48104c7d2f819f9e1f9eaf4c971c4c174e7b19e263f242fe3488452ac11fe7c689  tcp_wrappers-7.6-strerror.patch
+16a4157f41a250d5a9c9cad40686cf2359757fd81a816d72868b9dd71a1f1bea9599f84f46b790f3be82ca76a0efed374920e0c4e26870e4528fcfee41fcf3b9  tcp_wrappers-7.6-ldflags.patch
+8b0988d7a376521376a7953f431c4c12382bde86c9391a9ad538fd5694bc340cc619e957dd0ea5a03b118c3ab055a56f7992f6581e7fe98a472ada2182bd2c9c  tcp_wrappers-7.6-fix_sig-bug141110.patch
+ee5fd83a18b9fb8a26c3b99dfb2caadb349b09f71f21ad29b9cd1c51a2b938240c60d0373da4685085878da2e56ade47b2513e99d1b1a65bbefeb44c260a6b07  tcp_wrappers-7.6-162412.patch
+02783188291e1f142c1ac1bdb89cdd20656f7744a23b1d2a62d6d93415672e1d33b1bd9cdf7c9851318af35708d32a2401d305ea867770fd9918ca6856de3697  tcp_wrappers-7.6-220015.patch
+6649b61742a154412203734fcff82f8ba47d25ec743910d2890389587bdf870588d04902a1efe3cde69f70c7edf19701d5b6047a0635bcdede958e14821d7b60  tcp_wrappers-7.6-restore_sigalarm.patch
+7ebe75b579bda344dc4e994c4752678c8d6696fff21bdde26d3730b778c311d306bed5ecf0fb19c5115b9b507b966638ef7b2ac9e9498a471c5f3bc4b9f73419  tcp_wrappers-7.6-siglongjmp.patch
+69f94bcb53e143c3fbbf085dd75123e99c0539125e7683db897bab9f44ad3432652ed05b1d704519e08a0175ae93bc917f5a57d1bbe7b850651dadfea5dc5f72  tcp_wrappers-7.6-sigchld.patch
+ffc17a0a67e349189ca42d9f9265bed7cc13005b0d75b284c1b268530e3f3776ca5115ff9f5eda1a42fe325be8c0d6dd742db3ebd3cbb772a40334e3078c130f  tcp_wrappers-7.6-196326.patch
+2478442631a49973fb83e50e764ad7b0d0ca5a2bdf7e1271ac50f82f44a51dcff41a168c21912b16721428b492b8182439fdeb601e8abd19f2024dec5715f9c1  tcp_wrappers_7.6-249430.patch
+3c6d4f15614a2a10e7c5323d2f4ee95b2afa87350492142a9038bac8855bf8c3e4561b56d60d6b24a88b08160b7808fa8f0f62de756a76415a0fcfc80ad5d56d  tcp_wrappers-7.6-support-musllibc.patch"
